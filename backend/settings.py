@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+FIREBASE_CONFIG = os.path.join(BASE_DIR, 'C:\Users\scarl\Desktop\Ghost Zone\college\fall 2024\projects because OMG\senior prjct\SentimentAnalyzer\firebase\gramalytics-f2363-firebase-adminsdk-kz50i-3189aecca9.json')
 
 
 # Quick-start development settings - unsuitable for production
