@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from .firebase_service import add_document, get_document
+from firebase_admin import auth
 
 # User Management Functions
 def create_user(request):
@@ -35,3 +37,14 @@ def save_idea(request):
 def search_hashtag(request):
     # TODO: Query API or Firebase for hashtag health
     return JsonResponse({"hashtag": "example", "health": "Good"})
+
+def test_add_document(request): #test adding document to Firestore
+    data = {"hashtags": "art", "likes": "20", "niche": "art", "shares": "20", "timestamp": "November 18, 2024 at 4:36:20 AM UTC-5"}
+    add_document("post", data)
+
+def test_get_document(request): #test requesting the test add document
+    doc_id = "sample_doc_id" #! whatever the doc_id of the test add happens to be
+    document = get_document("post", doc_id)
+    if document:
+        return JsonResponse({"status": "success", "data": document})
+    return JsonResponse({"status": "error", "message": "Document not found."})
