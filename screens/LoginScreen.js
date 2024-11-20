@@ -1,16 +1,43 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert, } from 'react-native';
 import TextBox from '../components/TextBox';
 import Button from '../components/Button';
 import { FaUserAlt } from 'react-icons/fa';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { getDatabase, ref, get, child, set, onValue } from "firebase/database";
+import { auth, dbRef } from '../firebaseconfig';
 
 const LoginScreen = ({ navigation }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+   const [email, setEmail] = useState("");
+   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            const userEmail = user.email;
+            const subEmail = userEmail.match(/^(.*?)(?=@)/)[0];
+
+            get(child(dbRef, `Users/${subEmail}`))
+              .then((snapshot) => {
+                let trackLevel = snapshot.val();
+                navigation.navigate("HomeScreen", {
+                  subEmail: subEmail
+                });
+              })
+              .catch((error) => {
+                console.error("Error reading data:", error);
+              });
+          })
+          .catch((error) => {
+            const errorMessage = error.message;
+            Alert.alert("Error" + errorMessage);
+          });
     console.log('Submit clicked');
-        navigation.navigate('HomeScreen');
+
 
   };
 
@@ -30,8 +57,8 @@ const LoginScreen = ({ navigation }) => {
 
       <TextBox
         placeholder="Username or Email"
-        value={username}
-        onChangeText={setUsername}
+        value={email}
+        onChangeText={setEmail}
       />
       <TextBox
         placeholder="Password"

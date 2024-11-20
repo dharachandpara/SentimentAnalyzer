@@ -2,17 +2,39 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import TextBox from '../components/TextBox';
 import Button from '../components/Button';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from '../firebaseconfig'; // Import the auth object
 
 const SignupScreen = ({ navigation }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
   const [instagramUsername, setInstagramUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleCreateAccount = () => {
-    console.log('Account created');
-        navigation.navigate('HomeScreen');
+    createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            const userEmail = user.email;
+            const subEmail = userEmail.match(/^(.*?)(?=@)/)[0];
 
+            const path = "Users/" + subEmail;
+
+            navigation.navigate("SignIn");
+            Alert.alert("Sign Up Successful");
+          })
+          .catch((error) => {
+            const errorMessage = error.message;
+            Alert.alert("Error" + errorMessage);
+          });
+
+        console.log('Account created');
+        navigation.navigate('LoginScreen')
   }; 
 
   const handleSignInRedirect = () => {
@@ -32,6 +54,11 @@ const SignupScreen = ({ navigation }) => {
         placeholder="Last Name"
         value={lastName}
         onChangeText={setLastName}
+      />
+      <TextBox
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextBox
         placeholder="Instagram Username"
