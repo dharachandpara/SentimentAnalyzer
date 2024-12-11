@@ -1,8 +1,9 @@
 // src/backendLogic.js - all backend logic is contained here for easy scalability/modularity
-
 //mock storage for initial testing
 let savedIdeas = [];
 let discardedIdeas = [];
+const OPENAI_API_KEY =
+  "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";
 const hashtags = [
   // mocked hashtag table; used in queryHashtag and semanticSearch
   { tag: "art", engagement: 85, sentiment: 70 },
@@ -209,7 +210,6 @@ const queryHashtag = async (data) => {
     entry.tag.toLowerCase().includes(data.toLowerCase())
   ); // Fix property to `tag` and make it case-insensitive
   if (!match) {
-    console.error("Hashtag containing " + data + " not found.");
     return null;
   }
 
@@ -218,7 +218,6 @@ const queryHashtag = async (data) => {
     (niche) => niche.niche === match.tag
   )?.related; // match tag to niche
   if (!relatedKeywords) {
-    console.error("No related keywords found for niche: " + match.tag);
     return null;
   }
 
@@ -256,11 +255,34 @@ const getTrendingHashtags = async () => {
   };
 };
 
-const queryOpenAI = async (data) => {
-  // query specific OpenAI API key as a 'helper bot'
-  console.log("Querying with: " + data);
+const queryOpenAI = async (query) => {
   //placeholder until OpenAI API is integrated
-  return "This is a placeholder response for query: " + data;
+  const data = {
+    model: "gpt-4",
+    messages: [{ role: "user", content: query }],
+  };
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch from OpenAI");
+    }
+
+    const responseData = await response.json();
+
+    // Extract and return the assistant's response
+    return responseData.choices[0].message.content.trim();
+  } catch (error) {
+    return "An error occurred while fetching data.";
+  }
 };
 
 const generateTrends = async () => {
