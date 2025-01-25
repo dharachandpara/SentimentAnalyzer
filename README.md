@@ -1,6 +1,6 @@
-# SentimentBackend
+# Gramalytics
 
-Hey, this is Esther. Just letting you know I was able to access and clone the repo. 
+Gramalytics is an app that scores the health of topics and hashtags over time to present them to users to help leverage their social media.
 
 10/16/24 = 10/30/24
 -Once the DB is set up with firebase: 
